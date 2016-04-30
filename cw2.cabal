@@ -1,13 +1,13 @@
 name:                cw2
 version:             0.1.0.0
-synopsis:            Initial project template from stack
-description:         Please see README.md
-homepage:            http://github.com/githubuser/cw2#readme
+synopsis:            Coursework 2 for COMS22201 at the University of Bristol
+description:
+homepage:            http://github.com/rossng/COMS22201-cw2
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2016 Author Here
+author:              Ross Gardiner
+maintainer:          ross-public@gmx.com
+copyright:           2016 Ross Gardiner
 category:            Web
 build-type:          Simple
 -- extra-source-files:
@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Cwk2P1, Cwk2P2
+  exposed-modules:     Cwk2P1, Cwk2P2, Cwk2
   build-depends:       base >= 4.7 && < 5
   default-language:    Haskell2010
 

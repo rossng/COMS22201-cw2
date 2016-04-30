@@ -161,7 +161,7 @@ fac = Comp
                           (Neg (Eq (V "x") (N 1)))
                           (Comp
                             (Ass "y" (Mult (V "y") (V "x")))
-                            (Ass "y" (Sub (V "x") (N 1)))))
+                            (Ass "x" (Sub (V "x") (N 1)))))
                         (Comp
                           (WriteA (V "y"))
                           (Comp WriteLn WriteLn))))))))))
@@ -244,7 +244,7 @@ s_ds Skip ss = ss
 s_ds (Comp s1 s2) ss = (s_ds s2 . s_ds s1) ss
 s_ds (If c t e) (i,o,s) = cond' (b_val c, s_ds t, s_ds e) (i,o,s)
 s_ds (While c stm) s = fix (\g -> cond' (b_val c, g . s_ds stm, id)) s
-s_ds (Read v) (i:is,o,s) = (is, o, update s i v)
+s_ds (Read v) (i:is,o,s) = (is, o ++ ["<" ++ show i ++ ">"], update s i v)
 s_ds (WriteA a) (i,o,s) = (i, o ++ [show $ a_val a s], s)
 s_ds (WriteB b) (i,o,s) = (i, o ++ [show $ b_val b s], s)
 s_ds (WriteS str) (i,o,s) = (i, o ++ [str], s)
@@ -262,4 +262,8 @@ s_ds WriteLn (i,o,s) = (i, o ++ ["\n"], s)
 ---------------------------------------------------------------
 
 eval :: Stm -> IOState -> (Input, Output, [Var], [Num])
-eval = undefined
+eval stm ios = (i, o, v, n)
+               where
+                 (i, o, s) = s_ds stm ios
+                 v = fv_stm stm
+                 n = map s v
