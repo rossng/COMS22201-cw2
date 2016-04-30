@@ -91,6 +91,9 @@ b_val (And l r) s = b_val l s && b_val r s
 cond :: (a->T, a->a, a->a) -> (a->a)
 cond (b, p, q) s = if b s then p s else q s
 
+cond' :: (c->T, (a,b,c)->(a,b,c), (a,b,c)->(a,b,c)) -> ((a,b,c)->(a,b,c))
+cond' (b, p, q) (i,o,s) = if b s then p (i,o,s) else q (i,o,s)
+
 fix :: (a -> a) -> a
 fix f = let x = f x in x
 
@@ -225,7 +228,7 @@ pow = Comp
                                     (WriteS " is ")
                                     (WriteA (V "num")))))))))))
                   (Comp (WriteS "Invalid base ") (WriteA (V "base"))))
-                (WriteLn)))))
+                WriteLn))))
 
 ---------------------------------------------------------------
 -- Part E)
@@ -236,7 +239,16 @@ pow = Comp
 ---------------------------------------------------------------
 
 s_ds :: Stm -> IOState -> IOState
-s_ds = undefined
+s_ds (Ass v a) (i,o,s) = (i, o, update s (a_val a s) v)
+s_ds Skip ss = ss
+s_ds (Comp s1 s2) ss = (s_ds s2 . s_ds s1) ss
+s_ds (If c t e) (i,o,s) = cond' (b_val c, s_ds t, s_ds e) (i,o,s)
+s_ds (While c stm) s = fix (\g -> cond' (b_val c, g . s_ds stm, id)) s
+s_ds (Read v) (i:is,o,s) = (is, o, update s i v)
+s_ds (WriteA a) (i,o,s) = (i, o ++ [show $ a_val a s], s)
+s_ds (WriteB b) (i,o,s) = (i, o ++ [show $ b_val b s], s)
+s_ds (WriteS str) (i,o,s) = (i, o ++ [str], s)
+s_ds WriteLn (i,o,s) = (i, o ++ ["\n"], s)
 
 ---------------------------------------------------------------
 -- Part F)
